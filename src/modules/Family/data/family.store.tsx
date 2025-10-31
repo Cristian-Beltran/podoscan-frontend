@@ -1,12 +1,12 @@
 import { toast } from "sonner";
 import { create } from "zustand";
-import type { CreatePatient, Patient } from "../patient.interface";
+import type { CreateFamily, Family } from "../family.interface";
 import type { Status } from "@/types/status.interface";
-import { patientService } from "./patient.service";
+import { FamilyService } from "./family.service";
 
 interface UserClinicStore {
-  data: Patient[];
-  filteredData: Patient[];
+  data: Family[];
+  filteredData: Family[];
   search: string;
   isLoading: boolean;
   fetchFull: () => Promise<void>;
@@ -14,13 +14,13 @@ interface UserClinicStore {
   total: number;
   applySearch: (term: string) => void;
 
-  create: (payload: CreatePatient) => Promise<void>;
-  update: (id: string, payload: Partial<CreatePatient>) => Promise<void>;
+  create: (payload: CreateFamily) => Promise<void>;
+  update: (id: string, payload: Partial<CreateFamily>) => Promise<void>;
   remove: (id: string) => Promise<void>;
   changeStatus: (id: string, status: Status) => Promise<void>;
 }
 
-export const userPatientStore = create<UserClinicStore>((set, get) => ({
+export const userFamilyStore = create<UserClinicStore>((set, get) => ({
   data: [],
   filteredData: [],
   total: 0,
@@ -32,7 +32,7 @@ export const userPatientStore = create<UserClinicStore>((set, get) => ({
   async fetchFull() {
     set({ isLoading: true });
     try {
-      const data = await patientService.findAll();
+      const data = await FamilyService.findAll();
       set({
         data,
         filteredData: data,
@@ -63,14 +63,14 @@ export const userPatientStore = create<UserClinicStore>((set, get) => ({
   },
 
   async create(payload) {
-    const created = await patientService.create(payload);
+    const created = await FamilyService.create(payload);
     const { data } = get();
     set({
       data: [created, ...data],
       total: data.length + 1,
     });
     get().applySearch(get().search);
-    toast.success("Paciente creado");
+    toast.success("Familiar creado");
   },
 
   async reload() {
@@ -78,7 +78,7 @@ export const userPatientStore = create<UserClinicStore>((set, get) => ({
   },
 
   async update(id, payload) {
-    const updated = await patientService.update(id, payload);
+    const updated = await FamilyService.update(id, payload);
     console.log(updated);
     const { data } = get();
     data.map((item) => {
@@ -90,12 +90,12 @@ export const userPatientStore = create<UserClinicStore>((set, get) => ({
     console.log(updatedData);
     set({ data: updatedData });
     get().reload();
-    toast.success("Paciente actualizado");
+    toast.success("Familiar actualizado");
   },
 
   async remove(id) {
     try {
-      await patientService.remove(id);
+      await FamilyService.remove(id);
       const { data } = get();
       const updatedData = data.filter((item) => item.user.id !== id);
       set({
@@ -103,7 +103,7 @@ export const userPatientStore = create<UserClinicStore>((set, get) => ({
         total: updatedData.length,
       });
       get().reload();
-      toast.success("Paciente eliminado");
+      toast.success("Familiar eliminado");
     } catch (error) {
       console.error(error);
       toast.error("Ha Ocurrido un error");
@@ -112,7 +112,7 @@ export const userPatientStore = create<UserClinicStore>((set, get) => ({
 
   async changeStatus(id, status) {
     try {
-      const updated = await patientService.changeStatus(id, status);
+      const updated = await FamilyService.changeStatus(id, status);
       toast.success("Estado modificiado");
       const { data } = get();
       const updatedData = data.map((item) =>

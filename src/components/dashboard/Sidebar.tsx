@@ -1,154 +1,261 @@
+// src/components/layout/Sidebar.tsx
 import type React from "react";
-import { useLocation, Link, useNavigate } from "react-router-dom";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useState, useMemo } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  Activity,
-  LogOut,
-  X,
-  Moon,
-  Sun,
   Home,
-  Users,
-  UsersRound,
   User,
+  Sun,
+  Moon,
+  Droplet,
+  ChevronRight,
+  ChevronLeft,
+  Users,
+  PlusCircleIcon,
+  CalendarCheck,
   Microchip,
-  Wifi,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "../../lib/utils";
+import { useTheme } from "../../contexts/ThemeContext";
 import { useAuthStore } from "@/auth/useAuth";
 
 interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean; // móvil
+  onClose: () => void; // móvil
 }
 
-const navigationItems = [
+type NavItem = {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
+
+const NAV: NavItem[] = [
   { name: "Dashboard", href: "/", icon: Home },
-  { name: "Doctores", href: "/doctor", icon: UsersRound },
-  { name: "Pacientes", href: "/patients", icon: User },
-  { name: "Familiares", href: "/family", icon: Users },
-  { name: "Datos en tiempo Real", href: "/monitoring", icon: Wifi },
   { name: "Dispositivos", href: "/devices", icon: Microchip },
+  { name: "Pacientes", href: "/patients", icon: User },
+  { name: "Doctores", href: "/doctor", icon: PlusCircleIcon },
+  { name: "Familiares", href: "/family", icon: Users },
+  { name: "Citas", href: "/appointment", icon: CalendarCheck },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const { theme, toggleTheme } = useTheme();
 
-  const handleLogout = () => {
-    logout();
-    onClose();
-    navigate("/login");
+  const [expanded, setExpanded] = useState<boolean>(false);
+
+  const initials = useMemo(() => {
+    const base = (user?.fullname ?? "U").trim();
+    const parts = base.split(/\s+/);
+    return (parts[0]?.[0] ?? "U")
+      .concat(parts.length > 1 ? (parts[parts.length - 1][0] ?? "") : "")
+      .toUpperCase();
+  }, [user?.fullname]);
+
+  const isActive = (href: string) =>
+    href === "/"
+      ? location.pathname === "/"
+      : location.pathname.startsWith(href);
+
+  const backgroundStyle: React.CSSProperties = {
+    backgroundImage:
+      "radial-gradient(1200px 1200px at -10% -10%, rgba(34,197,94,0.10), transparent 60%), radial-gradient(1200px 1200px at 110% 110%, rgba(59,130,246,0.10), transparent 60%)",
   };
 
   return (
     <>
-      {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-background/70 backdrop-blur-sm z-40 lg:hidden"
           onClick={onClose}
+          aria-hidden
         />
       )}
 
-      {/* Sidebar */}
-      <div
+      <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
-          isOpen ? "translate-x-0" : "-translate-x-full",
+          "fixed left-0 top-0 z-50 h-screen border-r border-border/60 shadow-md",
+          "bg-sidebar/90 backdrop-blur supports-[backdrop-filter]:bg-sidebar/80",
+          "transition-[transform,width] duration-300 ease-in-out",
+          "lg:m-3 lg:rounded-2xl lg:h-[calc(100vh-1.5rem)]",
+          expanded ? "lg:w-72" : "lg:w-20",
+          isOpen ? "translate-x-0 w-72" : "-translate-x-full lg:translate-x-0",
         )}
+        style={backgroundStyle}
+        aria-label="Navegación"
       >
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-sidebar-border">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-sidebar-primary/10 rounded-lg">
-                <Activity className="h-6 w-6 text-sidebar-primary" />
-              </div>
-              <span className="text-lg font-bold text-sidebar-foreground">
-                MedDistrib
-              </span>
+        {/* Brand + rail toggle */}
+        <div
+          className={cn(
+            "relative flex items-center",
+            expanded ? "px-4" : "px-2",
+            "py-4",
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 grid place-items-center rounded-xl bg-primary/15 text-primary">
+              <Droplet className="h-4 w-4" />
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="lg:hidden text-sidebar-foreground hover:bg-sidebar-accent"
-            >
-              <X className="h-5 w-5" />
-            </Button>
+            {expanded && (
+              <div className="leading-tight">
+                <div className="text-sm font-semibold">PodoScan</div>
+                <div className="text-[11px] text-muted-foreground">
+                  Análisis plantar
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
-            {navigationItems.map((item) => {
-              const isActive = location.pathname === item.href;
-              const Icon = item.icon;
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="absolute right-2 top-2 lg:hidden rounded-xl"
+            aria-label="Cerrar sidebar"
+          >
+            ✕
+          </Button>
 
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  onClick={onClose}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="ml-auto hidden lg:inline-flex rounded-xl"
+            onClick={() => setExpanded((v) => !v)}
+            title={expanded ? "Colapsar" : "Expandir"}
+            aria-expanded={expanded}
+          >
+            {expanded ? (
+              <ChevronLeft className="h-5 w-5" />
+            ) : (
+              <ChevronRight className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
+
+        {/* Acción global (arriba) */}
+        <div className={cn(expanded ? "px-4" : "px-2")}>
+          <Button
+            variant="outline"
+            className={cn(
+              "w-full justify-center rounded-2xl border-dashed",
+              expanded ? "px-3" : "px-0",
+            )}
+            onClick={() => {
+              onClose();
+              navigate("/appointments/new");
+            }}
+          >
+            +
+          </Button>
+        </div>
+
+        {/* Navegación (píldoras con indicador a la izquierda) */}
+        <nav
+          className={cn("mt-3 space-y-1", expanded ? "px-3" : "px-2")}
+          aria-label="Principal"
+        >
+          {NAV.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                onClick={onClose}
+                className={cn(
+                  "group relative flex items-center rounded-2xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
+                  expanded ? "px-3 py-2.5" : "px-2.5 py-2 justify-center",
+                  active
+                    ? "bg-primary/15 text-primary shadow-sm ring-1 ring-primary/20"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                )}
+                aria-current={active ? "page" : undefined}
+              >
+                {/* Indicador al borde izquierdo */}
+                <span
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    "absolute left-1.5 h-6 w-1 rounded-full",
+                    active
+                      ? "bg-primary"
+                      : "bg-transparent group-hover:bg-muted-foreground/40",
+                  )}
+                />
+                <span
+                  className={cn(
+                    "grid place-items-center rounded-xl h-9 w-9 shrink-0",
+                    active
+                      ? "bg-primary/20"
+                      : "bg-muted/40 group-hover:bg-muted/60",
                   )}
                 >
                   <Icon className="h-5 w-5" />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </nav>
+                </span>
+                {expanded && (
+                  <span className="ml-3 text-sm font-medium truncate">
+                    {item.name}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
 
-          {/* Footer */}
-          <div className="p-4 border-t border-sidebar-border space-y-4">
-            {/* Theme Toggle */}
+        {/* Footer minimal */}
+        <div
+          className={cn(
+            "absolute bottom-0 left-0 right-0 border-t border-border/60",
+            expanded ? "px-3" : "px-2",
+            "py-3",
+          )}
+        >
+          <div
+            className={cn(
+              "mb-2 flex items-center gap-3 rounded-xl bg-muted/40",
+              expanded ? "px-3 py-2.5" : "px-2 py-2 justify-center",
+            )}
+          >
+            <div className="h-9 w-9 grid place-items-center rounded-lg bg-primary text-primary-foreground">
+              <span className="text-sm font-semibold">{initials}</span>
+            </div>
+            {expanded && (
+              <div className="min-w-0">
+                <p className="text-sm font-medium truncate">
+                  {user?.fullname ?? "Usuario"}
+                </p>
+                <p className="text-[11px] text-muted-foreground truncate">
+                  {user?.email ?? ""}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className={cn("flex", expanded ? "gap-2" : "flex-col gap-2")}>
             <Button
               variant="ghost"
+              className={cn(
+                "justify-start rounded-xl",
+                expanded ? "w-full px-3" : "w-full px-0 justify-center",
+              )}
               onClick={toggleTheme}
-              className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent"
+              title={theme === "light" ? "Modo oscuro" : "Modo claro"}
+              aria-label={
+                theme === "light" ? "Activar modo oscuro" : "Activar modo claro"
+              }
             >
               {theme === "light" ? (
                 <Moon className="h-5 w-5" />
               ) : (
                 <Sun className="h-5 w-5" />
               )}
-              {theme === "light" ? "Modo Oscuro" : "Modo Claro"}
-            </Button>
-
-            {/* User Info */}
-            {user && (
-              <div className="px-3 py-2 bg-sidebar-accent/50 rounded-lg">
-                <p className="text-sm font-medium text-sidebar-foreground">
-                  {user.fullname}
-                </p>
-                <p className="text-xs text-sidebar-foreground/60">
-                  {
-                    //user.email
-                  }
-                </p>
-              </div>
-            )}
-
-            {/* Logout */}
-            <Button
-              variant="ghost"
-              onClick={handleLogout}
-              className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10"
-            >
-              <LogOut className="h-5 w-5" />
-              Cerrar Sesión
+              {expanded && <span className="ml-2 text-sm">Tema</span>}
             </Button>
           </div>
         </div>
-      </div>
+      </aside>
     </>
   );
 };
