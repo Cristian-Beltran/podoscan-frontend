@@ -54,9 +54,9 @@ export function SessionCharts() {
   }, [sessions]);
 
   const pressureConfig = {
-    avgP1: { label: "P1 (Talón)", color: "hsl(var(--primary))" },
-    avgP2: { label: "P2 (Mediopié)", color: "hsl(var(--secondary))" },
-    avgP3: { label: "P3 (Antepié)", color: "hsl(var(--accent))" },
+    avgP1: { label: "P1 (Talón) [kg]", color: "hsl(var(--primary))" },
+    avgP2: { label: "P2 (Mediopié) [kg]", color: "hsl(var(--secondary))" },
+    avgP3: { label: "P3 (Antepié) [kg]", color: "hsl(var(--accent))" },
   };
 
   const accelerationConfig = {

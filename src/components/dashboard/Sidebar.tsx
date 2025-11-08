@@ -14,6 +14,7 @@ import {
   PlusCircleIcon,
   CalendarCheck,
   Microchip,
+  UsersRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "../../lib/utils";
@@ -25,19 +26,19 @@ interface SidebarProps {
   onClose: () => void; // móvil
 }
 
-type NavItem = {
-  name: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-};
-
-const NAV: NavItem[] = [
+const doctorMenu = [
   { name: "Dashboard", href: "/", icon: Home },
   { name: "Dispositivos", href: "/devices", icon: Microchip },
   { name: "Pacientes", href: "/patients", icon: User },
   { name: "Doctores", href: "/doctor", icon: PlusCircleIcon },
   { name: "Familiares", href: "/family", icon: Users },
   { name: "Citas", href: "/appointment", icon: CalendarCheck },
+];
+
+const patientMenu = [{ name: "Mis datos", href: "/me", icon: User }];
+
+const familyMenu = [
+  { name: "Familiares", href: "/family/patients", icon: UsersRound },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
@@ -55,6 +56,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       .concat(parts.length > 1 ? (parts[parts.length - 1][0] ?? "") : "")
       .toUpperCase();
   }, [user?.fullname]);
+
+  if (!(user && user.type)) return;
+  const navigationItems =
+    user?.type === "doctor"
+      ? doctorMenu
+      : user?.type === "patient"
+        ? patientMenu
+        : familyMenu;
 
   const isActive = (href: string) =>
     href === "/"
@@ -158,7 +167,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           className={cn("mt-3 space-y-1", expanded ? "px-3" : "px-2")}
           aria-label="Principal"
         >
-          {NAV.map((item) => {
+          {navigationItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
             return (

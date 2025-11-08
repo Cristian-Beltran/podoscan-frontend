@@ -27,12 +27,21 @@ import {
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import type { Appointment } from "../Appoinment/appointment.interface";
 import { appointmentService } from "../Appoinment/data/appointment.service";
+import { Navigate } from "react-router-dom";
+import { useAuthStore } from "@/auth/useAuth";
 
 export default function DashboardPage() {
+  const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [patientsCount, setPatientsCount] = useState(0);
   const [devicesCount, setDevicesCount] = useState(0);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const redirectTo =
+    user?.type === "patient"
+      ? "/me"
+      : user?.type === "family"
+        ? "/family/patients"
+        : null;
 
   useEffect(() => {
     let mounted = true;
@@ -114,6 +123,8 @@ export default function DashboardPage() {
   const chartConfig = {
     count: { label: "Citas", color: "hsl(var(--primary))" },
   };
+
+  if (redirectTo) return <Navigate to={redirectTo} replace />;
 
   return (
     <div className="space-y-6">

@@ -12,6 +12,8 @@ import AppoinmentPage from "./modules/Appoinment/appointment";
 import AppointmentViewPage from "./modules/Appoinment/view-appointment";
 import SessionPage from "./modules/Session/session";
 import GalleryPage from "./modules/Appoinment/list-appointment";
+import MePage from "./modules/MeData/me.page";
+import FamilyPatientsPage from "./modules/FamilyPatients/familypatient.page";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -32,6 +34,10 @@ export const router = createBrowserRouter([
       { path: "appointment/:id", element: <AppointmentViewPage /> },
       { path: "session/:id", element: <SessionPage /> },
       { path: "gallery/:id", element: <GalleryPage /> },
+
+      { path: "me", element: <MePage /> },
+      { path: "me/:id", element: <MePage /> },
+      { path: "family/patients", element: <FamilyPatientsPage /> },
     ],
   },
   { path: "*", element: <NotFoundPage /> },

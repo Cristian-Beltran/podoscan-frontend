@@ -14,8 +14,11 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import type { Session, SessionData } from "../session.interface";
+
+// Tipos derivados del store (sin usar any)
 
 export function SessionsTable() {
   const { sessions, isLoading } = sessionStore();
@@ -41,6 +44,94 @@ export function SessionsTable() {
       hour: "2-digit",
       minute: "2-digit",
     });
+
+  const toCsvValue = (
+    value: string | number | boolean | null | undefined,
+  ): string => {
+    if (value === null || value === undefined) return "";
+    const str = String(value);
+    if (str.includes('"') || str.includes(",") || str.includes("\n")) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  const downloadSessionCsv = (session: Session) => {
+    const headers = [
+      "sessionId",
+      "patientFullname",
+      "deviceModel",
+      "deviceSerial",
+      "startedAt",
+      "endedAt",
+      "recordId",
+      "recordedAt",
+      "p1",
+      "p2",
+      "p3",
+      "p4",
+      "p5",
+      "ax",
+      "ay",
+      "az",
+      "gx",
+      "gy",
+      "gz",
+    ];
+
+    const rows: string[] = [];
+    rows.push(headers.join(","));
+
+    const patientName = session.patient?.user?.fullname ?? "";
+    const deviceModel = session.device?.model ?? "";
+    const deviceSerial = session.device?.serialNumber ?? "";
+    const startedAt = session.startedAt
+      ? new Date(session.startedAt).toISOString()
+      : "";
+    const endedAt = session.endedAt
+      ? new Date(session.endedAt).toISOString()
+      : "";
+
+    (session.records ?? []).forEach((record: SessionData) => {
+      const rowValues: (string | number | boolean | null | undefined)[] = [
+        session.id,
+        patientName,
+        deviceModel,
+        deviceSerial,
+        startedAt,
+        endedAt,
+        record.id,
+        record.recordedAt ? new Date(record.recordedAt).toISOString() : "",
+        record.p1,
+        record.p2,
+        record.p3,
+        record.p4,
+        record.p5,
+        record.ax,
+        record.ay,
+        record.az,
+        record.gx,
+        record.gy,
+        record.gz,
+      ];
+
+      const row = rowValues.map(toCsvValue).join(",");
+      rows.push(row);
+    });
+
+    const csvContent = rows.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const filename = `session-${String(session.id).slice(0, 8)}.csv`;
+
+    link.href = url;
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="rounded-md border">
@@ -135,28 +226,47 @@ export function SessionsTable() {
                   <CollapsibleContent asChild>
                     <TableRow>
                       <TableCell colSpan={7} className="bg-muted/50 p-0">
-                        <div className="overflow-x-auto p-4">
+                        {/* Header del detalle + botón CSV */}
+                        <div className="flex items-center justify-between gap-2 p-4 pb-2">
+                          <span className="text-xs text-muted-foreground">
+                            Registros de la sesión
+                          </span>
+                          <Button
+                            variant="outline"
+                            onClick={() => downloadSessionCsv(session)}
+                            disabled={
+                              !session.records || session.records.length === 0
+                            }
+                          >
+                            <Download className="mr-1 h-3 w-3" />
+                            CSV
+                          </Button>
+                        </div>
+
+                        <div className="overflow-x-auto p-4 pt-2">
                           <Table>
                             <TableHeader>
                               <TableRow>
                                 <TableHead className="text-xs">
                                   Tiempo
                                 </TableHead>
+
                                 <TableHead className="text-xs">
-                                  P1 (Talón)
+                                  P1 (Talón, kg)
                                 </TableHead>
                                 <TableHead className="text-xs">
-                                  P2 (Mediopié 1)
+                                  P2 (Mediopié 1, kg)
                                 </TableHead>
                                 <TableHead className="text-xs">
-                                  P3 (Mediopié 2)
+                                  P3 (Mediopié 2, kg)
                                 </TableHead>
                                 <TableHead className="text-xs">
-                                  P4 (Antepié 1)
+                                  P4 (Antepié 1, kg)
                                 </TableHead>
                                 <TableHead className="text-xs">
-                                  P5 (Antepié 2)
+                                  P5 (Antepié 2, kg)
                                 </TableHead>
+
                                 <TableHead className="text-xs">AX</TableHead>
                                 <TableHead className="text-xs">AY</TableHead>
                                 <TableHead className="text-xs">AZ</TableHead>
@@ -166,9 +276,9 @@ export function SessionsTable() {
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {session.records?.map((record) => (
+                              {session.records?.map((record: SessionData) => (
                                 <TableRow key={record.id}>
-                                  <TableCell className="text-[10px] md:text-xs font-mono">
+                                  <TableCell className="font-mono text-[10px] md:text-xs">
                                     {new Date(
                                       record.recordedAt,
                                     ).toLocaleTimeString("es-ES")}

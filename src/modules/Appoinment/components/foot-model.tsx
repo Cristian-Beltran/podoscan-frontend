@@ -1,6 +1,4 @@
-"use client";
-
-import { Suspense, useMemo } from "react";
+import { Suspense } from "react";
 import {
   Dialog,
   DialogContent,
@@ -22,49 +20,46 @@ type Props = {
 };
 
 function FootPlaceholder(props: ThreeElements["group"]) {
-  const skin = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: "#d9b7a5",
-        roughness: 0.7,
-        metalness: 0.0,
-      }),
-    [],
-  );
-
   return (
     <group {...props} rotation={[0, Math.PI / 2.5, 0]} position={[0, 0.1, 0]}>
-      <mesh castShadow receiveShadow material={skin}>
+      {/* Pie “principal” */}
+      <mesh castShadow receiveShadow>
         <capsuleGeometry args={[0.55, 0.9, 8, 16]} />
+        <meshStandardMaterial color="#d9b7a5" roughness={0.7} metalness={0} />
       </mesh>
-      <mesh
-        position={[-0.65, -0.05, 0]}
-        castShadow
-        receiveShadow
-        material={skin}
-      >
+
+      {/* Talón */}
+      <mesh position={[-0.65, -0.05, 0]} castShadow receiveShadow>
         <capsuleGeometry args={[0.38, 0.2, 8, 16]} />
+        <meshStandardMaterial color="#d9b7a5" roughness={0.7} metalness={0} />
       </mesh>
-      <mesh
-        position={[0.55, -0.05, 0]}
-        castShadow
-        receiveShadow
-        material={skin}
-      >
+
+      {/* Almohadilla delantera */}
+      <mesh position={[0.55, -0.05, 0]} castShadow receiveShadow>
         <capsuleGeometry args={[0.45, 0.35, 8, 16]} />
+        <meshStandardMaterial color="#d9b7a5" roughness={0.7} metalness={0} />
       </mesh>
-      {[...Array(5)].map((_, i) => (
-        <mesh
-          key={i}
-          position={[0.9, -0.08, (i - 2) * 0.18]}
-          scale={[0.22 - i * 0.02, 0.22 - i * 0.02, 0.22 - i * 0.02]}
-          castShadow
-          receiveShadow
-          material={skin}
-        >
-          <sphereGeometry args={[0.35, 16, 16]} />
-        </mesh>
-      ))}
+
+      {/* Dedos */}
+      {[...Array(5)].map((_, i) => {
+        const scale = 0.22 - i * 0.02;
+        return (
+          <mesh
+            key={i}
+            position={[0.9, -0.08, (i - 2) * 0.18]}
+            scale={[scale, scale, scale]}
+            castShadow
+            receiveShadow
+          >
+            <sphereGeometry args={[0.35, 16, 16]} />
+            <meshStandardMaterial
+              color="#d9b7a5"
+              roughness={0.7}
+              metalness={0}
+            />
+          </mesh>
+        );
+      })}
     </group>
   );
 }
@@ -72,6 +67,7 @@ function FootPlaceholder(props: ThreeElements["group"]) {
 function FootGLTF({ url }: { url: string }) {
   // Hook SIEMPRE se llama al renderizar este componente
   const gltf = useGLTF(url) as unknown as GLTF;
+
   return (
     <group position={[0, 0, 0]} rotation={[Math.PI, 0, 0]}>
       <primitive object={gltf.scene as THREE.Object3D} castShadow />
@@ -81,7 +77,13 @@ function FootGLTF({ url }: { url: string }) {
 
 export default function FootPreviewModal({ isOpen, onClose, modelUrl }: Props) {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        // Solo cerramos desde aquí
+        if (!open) onClose();
+      }}
+    >
       <DialogContent className="max-w-5xl p-0">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>Vista 3D del pie</DialogTitle>
@@ -89,6 +91,7 @@ export default function FootPreviewModal({ isOpen, onClose, modelUrl }: Props) {
 
         <div className="h-[520px] w-full">
           <Canvas shadows camera={{ position: [2.2, 1.2, 2.2], fov: 45 }}>
+            {/* Luces */}
             <ambientLight intensity={0.6} />
             <directionalLight
               position={[3, 4, 2]}
@@ -127,7 +130,7 @@ export default function FootPreviewModal({ isOpen, onClose, modelUrl }: Props) {
               minDistance={1.2}
               maxDistance={5}
               target={[0, 0.15, 0]}
-              maxPolarAngle={Math.PI - 0.05} // antes ~0.49π; ahora casi 180°
+              maxPolarAngle={Math.PI - 0.05}
             />
           </Canvas>
         </div>
