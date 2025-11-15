@@ -1,12 +1,6 @@
 // src/components/layout/Header.tsx
 import React, { useMemo } from "react";
-import {
-  Menu,
-  Footprints,
-  ScanLine,
-  LogOut,
-  User as UserIcon,
-} from "lucide-react";
+import { Menu, Footprints, LogOut, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/auth/useAuth";
 import { cn } from "@/lib/utils";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -60,12 +54,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, className }) => {
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <Link to="/appointment">
-              <Button size="sm" className="rounded-2xl px-4 py-2 shadow-sm">
-                <ScanLine className="mr-2 h-4 w-4" />
-                Ver citas
-              </Button>
-            </Link>
           </div>
 
           {/* Centro: separador visual (sin contenidos) */}

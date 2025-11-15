@@ -32,16 +32,17 @@ import type { Appointment } from "../Appoinment/appointment.interface";
 export default function MePage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuthStore();
-  const patientId = id || user?.id || "";
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
+  const [patientId, setPatientId] = useState<string | null>(null);
   useEffect(() => {
     let mounted = true;
     (async () => {
+      setPatientId(id || user?.id || "");
       if (!patientId) return;
       setLoading(true);
       setError(null);
