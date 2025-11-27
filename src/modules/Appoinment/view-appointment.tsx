@@ -460,6 +460,7 @@ export default function AppointmentViewPage() {
                   <Input
                     id="forefootWidthMm"
                     type="number"
+                    disabled
                     inputMode="decimal"
                     placeholder="0"
                     value={forefootWidthMm}
@@ -482,6 +483,7 @@ export default function AppointmentViewPage() {
                   <Input
                     id="isthmusWidthMm"
                     type="number"
+                    disabled
                     inputMode="decimal"
                     placeholder="0"
                     value={isthmusWidthMm}
@@ -503,6 +505,7 @@ export default function AppointmentViewPage() {
                   </Label>
                   <Input
                     id="chippauxSmirakIndex"
+                    disabled
                     type="number"
                     inputMode="decimal"
                     placeholder="0"
