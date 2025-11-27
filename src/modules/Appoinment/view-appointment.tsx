@@ -15,7 +15,10 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAppointmentStore } from "./data/appointment.store";
-import type { Appointment } from "./appointment.interface";
+import type {
+  Appointment,
+  EditAppointmentPatientData,
+} from "./appointment.interface";
 import { useNavigate, useParams } from "react-router-dom";
 import FootPreviewModal from "./components/foot-model";
 
@@ -47,6 +50,13 @@ export default function AppointmentViewPage() {
   const [midfootPct, setMidfootPct] = useState<number | "">("");
   const [rearfootPct, setRearfootPct] = useState<number | "">("");
 
+  // 👉 nuevos campos geométricos
+  const [forefootWidthMm, setForefootWidthMm] = useState<number | "">("");
+  const [isthmusWidthMm, setIsthmusWidthMm] = useState<number | "">("");
+  const [chippauxSmirakIndex, setChippauxSmirakIndex] = useState<number | "">(
+    "",
+  );
+
   // imágenes
   const [isProcessing, setIsProcessing] = useState(false);
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
@@ -75,6 +85,24 @@ export default function AppointmentViewPage() {
     setForefootPct(appt.forefootPct ?? 0);
     setMidfootPct(appt.midfootPct ?? 0);
     setRearfootPct(appt.rearfootPct ?? 0);
+
+    setForefootWidthMm(
+      appt.forefootWidthMm !== null && appt.forefootWidthMm !== undefined
+        ? appt.forefootWidthMm
+        : "",
+    );
+    setIsthmusWidthMm(
+      appt.isthmusWidthMm !== null && appt.isthmusWidthMm !== undefined
+        ? appt.isthmusWidthMm
+        : "",
+    );
+    setChippauxSmirakIndex(
+      appt.chippauxSmirakIndex !== null &&
+        appt.chippauxSmirakIndex !== undefined
+        ? appt.chippauxSmirakIndex
+        : "",
+    );
+
     setOriginalUrl(appt.originalUrl ?? null);
     setProcessedUrl(appt.processedUrl ?? null);
   }, [appt]);
@@ -96,8 +124,36 @@ export default function AppointmentViewPage() {
     try {
       setIsProcessing(true);
       const updated = await uploadPhoto(id, file);
+
+      // URLs
       setOriginalUrl(updated.originalUrl ?? null);
       setProcessedUrl(updated.processedUrl ?? null);
+
+      // Métricas de presión
+      setContactTotalPct(updated.contactTotalPct ?? 0);
+      setForefootPct(updated.forefootPct ?? 0);
+      setMidfootPct(updated.midfootPct ?? 0);
+      setRearfootPct(updated.rearfootPct ?? 0);
+
+      // Métricas geométricas
+      setForefootWidthMm(
+        updated.forefootWidthMm !== null &&
+          updated.forefootWidthMm !== undefined
+          ? updated.forefootWidthMm
+          : "",
+      );
+      setIsthmusWidthMm(
+        updated.isthmusWidthMm !== null && updated.isthmusWidthMm !== undefined
+          ? updated.isthmusWidthMm
+          : "",
+      );
+      setChippauxSmirakIndex(
+        updated.chippauxSmirakIndex !== null &&
+          updated.chippauxSmirakIndex !== undefined
+          ? updated.chippauxSmirakIndex
+          : "",
+      );
+
       toast.success("Imagen subida");
     } catch {
       toast.error("No se pudo subir la imagen");
@@ -111,13 +167,25 @@ export default function AppointmentViewPage() {
   const persist = async () => {
     if (!id) return;
     try {
-      await editPatientData(id, {
+      const payload: EditAppointmentPatientData = {
         note,
-        contactTotalPct: Number(contactTotalPct || 0),
-        forefootPct: Number(forefootPct || 0),
-        midfootPct: Number(midfootPct || 0),
-        rearfootPct: Number(rearfootPct || 0),
-      });
+      };
+
+      // Solo mandamos lo que tenga valor, para no pisar con 0/null sin querer
+      if (contactTotalPct !== "")
+        payload.contactTotalPct = Number(contactTotalPct);
+      if (forefootPct !== "") payload.forefootPct = Number(forefootPct);
+      if (midfootPct !== "") payload.midfootPct = Number(midfootPct);
+      if (rearfootPct !== "") payload.rearfootPct = Number(rearfootPct);
+
+      if (forefootWidthMm !== "")
+        payload.forefootWidthMm = Number(forefootWidthMm);
+      if (isthmusWidthMm !== "")
+        payload.isthmusWidthMm = Number(isthmusWidthMm);
+      if (chippauxSmirakIndex !== "")
+        payload.chippauxSmirakIndex = Number(chippauxSmirakIndex);
+
+      await editPatientData(id, payload);
       toast.success("Datos clínicos guardados");
     } catch {
       toast.error("No se pudieron guardar los datos");
@@ -283,7 +351,7 @@ export default function AppointmentViewPage() {
               </div>
             </div>
 
-            {/* Métricas */}
+            {/* Métricas porcentuales */}
             <div className="space-y-2">
               <Label>Métricas (porcentaje)</Label>
               <div className="grid gap-4 md:grid-cols-4">
@@ -297,6 +365,7 @@ export default function AppointmentViewPage() {
                   <Input
                     id="contactTotalPct"
                     type="number"
+                    disabled
                     inputMode="decimal"
                     placeholder="0"
                     value={contactTotalPct}
@@ -317,6 +386,7 @@ export default function AppointmentViewPage() {
                   </Label>
                   <Input
                     id="forefootPct"
+                    disabled
                     type="number"
                     inputMode="decimal"
                     placeholder="0"
@@ -338,6 +408,7 @@ export default function AppointmentViewPage() {
                   </Label>
                   <Input
                     id="midfootPct"
+                    disabled
                     type="number"
                     inputMode="decimal"
                     placeholder="0"
@@ -359,12 +430,85 @@ export default function AppointmentViewPage() {
                   </Label>
                   <Input
                     id="rearfootPct"
+                    disabled
                     type="number"
                     inputMode="decimal"
                     placeholder="0"
                     value={rearfootPct}
                     onChange={(e) =>
                       setRearfootPct(
+                        e.target.value === "" ? "" : Number(e.target.value),
+                      )
+                    }
+                    className="print:border-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 👉 Métricas geométricas / índice Chippaux-Smirak */}
+            <div className="space-y-2">
+              <Label>Métricas geométricas</Label>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="forefootWidthMm"
+                    className="text-sm text-muted-foreground"
+                  >
+                    Ancho antepié (cm)
+                  </Label>
+                  <Input
+                    id="forefootWidthMm"
+                    type="number"
+                    inputMode="decimal"
+                    placeholder="0"
+                    value={forefootWidthMm}
+                    onChange={(e) =>
+                      setForefootWidthMm(
+                        e.target.value === "" ? "" : Number(e.target.value),
+                      )
+                    }
+                    className="print:border-none"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="isthmusWidthMm"
+                    className="text-sm text-muted-foreground"
+                  >
+                    Ancho istmo (cm)
+                  </Label>
+                  <Input
+                    id="isthmusWidthMm"
+                    type="number"
+                    inputMode="decimal"
+                    placeholder="0"
+                    value={isthmusWidthMm}
+                    onChange={(e) =>
+                      setIsthmusWidthMm(
+                        e.target.value === "" ? "" : Number(e.target.value),
+                      )
+                    }
+                    className="print:border-none"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="chippauxSmirakIndex"
+                    className="text-sm text-muted-foreground"
+                  >
+                    Índice Chippaux-Smirak (%)
+                  </Label>
+                  <Input
+                    id="chippauxSmirakIndex"
+                    type="number"
+                    inputMode="decimal"
+                    placeholder="0"
+                    value={chippauxSmirakIndex}
+                    onChange={(e) =>
+                      setChippauxSmirakIndex(
                         e.target.value === "" ? "" : Number(e.target.value),
                       )
                     }

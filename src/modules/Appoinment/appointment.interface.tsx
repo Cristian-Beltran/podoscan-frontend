@@ -11,6 +11,15 @@ export interface AppointmentMetrics {
   forefootPct: number; // default 0 en entidad
   midfootPct: number; // default 0 en entidad
   rearfootPct: number; // default 0 en entidad
+
+  /** Ancho del antepié (a) en mm, nullable en backend */
+  forefootWidthMm?: number | null;
+
+  /** Ancho del istmo (b) en mm, nullable en backend */
+  isthmusWidthMm?: number | null;
+
+  /** Índice de Chippaux-Smirak en %, nullable en backend */
+  chippauxSmirakIndex?: number | null;
 }
 
 /** Respuesta de API para una cita (JSON): fechas en ISO string */
@@ -42,4 +51,9 @@ export interface EditAppointmentPatientData {
   midfootPct?: number;
   rearfootPct?: number;
   note?: string;
+
+  /** Nuevos campos geométricos */
+  forefootWidthMm?: number;
+  isthmusWidthMm?: number;
+  chippauxSmirakIndex?: number;
 }

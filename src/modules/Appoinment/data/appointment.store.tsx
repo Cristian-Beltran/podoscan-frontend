@@ -9,7 +9,7 @@ import type {
 import { appointmentService } from "./appointment.service";
 
 type AppointmentStore = {
-  data: Appointment[]; // caché local (si las agregas manualmente)
+  data: Appointment[]; // caché local
   filteredData: Appointment[];
   total: number;
   search: string;
@@ -74,6 +74,7 @@ export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
       set({
         data,
         filteredData: data,
+        total: data.length,
         isLoading: false,
       });
       get().applySearch(get().search);
@@ -83,13 +84,13 @@ export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
       set({ isLoading: false });
     }
   },
+
   // ------- Service-backed -------
 
   async create(payload) {
     set({ isLoading: true });
     try {
       const created = await appointmentService.create(payload);
-      // Actualiza caché local
       const { data } = get();
       const next = [created, ...data];
       set({ data: next, total: next.length, isLoading: false });
@@ -108,7 +109,7 @@ export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
     try {
       const updated = await appointmentService.update(id, payload);
       const next = get().data.map((a) => (a.id === id ? updated : a));
-      set({ data: next, isLoading: false });
+      set({ data: next, isLoading: false, total: next.length });
       get().reload();
       toast.success("Cita actualizada");
       return updated;
@@ -126,11 +127,11 @@ export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
 
       const current = get().data;
       const next = current.some((a) => a.id === appt.id)
-        ? current.map((a) => (a.id === appt.id ? appt : a)) // update
-        : [appt, ...current]; // insert
+        ? current.map((a) => (a.id === appt.id ? appt : a))
+        : [appt, ...current];
 
       set({ data: next, total: next.length, isLoading: false });
-      get().reload(); // re-aplica el filtro actual
+      get().reload();
       return appt;
     } catch (e) {
       set({ isLoading: false });
@@ -144,7 +145,7 @@ export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
     try {
       const updated = await appointmentService.editPatientData(id, payload);
       const next = get().data.map((a) => (a.id === id ? updated : a));
-      set({ data: next, isLoading: false });
+      set({ data: next, total: next.length, isLoading: false });
       get().reload();
       toast.success("Datos clínicos actualizados");
       return updated;
@@ -160,7 +161,7 @@ export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
     try {
       const updated = await appointmentService.uploadPhoto(id, file);
       const next = get().data.map((a) => (a.id === id ? updated : a));
-      set({ data: next, isLoading: false });
+      set({ data: next, total: next.length, isLoading: false });
       get().reload();
       toast.success("Foto subida");
       return updated;

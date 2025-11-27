@@ -37,6 +37,40 @@ export function PlantarPhotosGallery({ patientId }: { patientId: string }) {
       minute: "2-digit",
     });
 
+  // helper para badge de Chippaux
+  const getChippauxBadge = (appt: Appointment) => {
+    const idx = appt.chippauxSmirakIndex;
+    const hasIndex =
+      idx !== null && idx !== undefined && !Number.isNaN(Number(idx));
+
+    if (!hasIndex) {
+      return (
+        <Badge variant="outline" className="text-xs">
+          {Number(appt.contactTotalPct ?? 0).toFixed(0)}% contacto
+        </Badge>
+      );
+    }
+
+    const value = Number(idx);
+    let variant: "default" | "outline" | "secondary" = "outline";
+    const label = `${value.toFixed(0)}% Chippaux`;
+
+    // puedes ajustar rangos según criterio clínico
+    if (value < 25) {
+      variant = "secondary"; // más bien normal/bajo
+    } else if (value < 45) {
+      variant = "default"; // intermedio
+    } else {
+      variant = "default";
+    }
+
+    return (
+      <Badge variant={variant} className="text-xs">
+        {label}
+      </Badge>
+    );
+  };
+
   if (loading) {
     return (
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -74,9 +108,9 @@ export function PlantarPhotosGallery({ patientId }: { patientId: string }) {
                 <Footprints className="h-5 w-5 text-primary" />
                 Evaluación
               </CardTitle>
-              <Badge variant="outline" className="text-xs">
-                {Number(appointment.contactTotalPct ?? 0).toFixed(0)}%
-              </Badge>
+
+              {/* Badge: prioridad al índice de Chippaux; fallback contacto total */}
+              {getChippauxBadge(appointment)}
             </div>
 
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -124,6 +158,34 @@ export function PlantarPhotosGallery({ patientId }: { patientId: string }) {
                 </div>
                 <div className="text-lg font-semibold text-orange-600 dark:text-orange-400">
                   {Number(appointment.rearfootPct ?? 0).toFixed(0)}%
+                </div>
+              </div>
+            </div>
+
+            {/* Métricas geométricas / Chippaux */}
+            <div className="grid grid-cols-3 gap-2 text-center text-xs">
+              <div className="rounded-md bg-muted/60 p-2">
+                <div className="text-muted-foreground">Antepié (cm)</div>
+                <div className="mt-1 font-semibold">
+                  {appointment.forefootWidthMm != null
+                    ? appointment.forefootWidthMm.toFixed(1)
+                    : "—"}
+                </div>
+              </div>
+              <div className="rounded-md bg-muted/60 p-2">
+                <div className="text-muted-foreground">Istmo (cm)</div>
+                <div className="mt-1 font-semibold">
+                  {appointment.isthmusWidthMm != null
+                    ? appointment.isthmusWidthMm.toFixed(1)
+                    : "—"}
+                </div>
+              </div>
+              <div className="rounded-md bg-muted/60 p-2">
+                <div className="text-muted-foreground">Chippaux (%)</div>
+                <div className="mt-1 font-semibold">
+                  {appointment.chippauxSmirakIndex != null
+                    ? appointment.chippauxSmirakIndex.toFixed(1)
+                    : "—"}
                 </div>
               </div>
             </div>

@@ -592,6 +592,7 @@ function EmptyState({ caption }: { caption: string }) {
 }
 
 /** ===================== UI: Citas ===================== */
+
 function AppointmentsGallerySimple({
   appointments,
 }: {
@@ -608,6 +609,42 @@ function AppointmentsGallerySimple({
   }
 
   const toPct = (n?: number | null) => Number(n ?? 0).toFixed(0) + "%";
+  const formatMm = (n?: number | null) =>
+    n != null ? n.toFixed(1) + " cm" : "—";
+  const formatChippaux = (n?: number | null) =>
+    n != null ? n.toFixed(1) + "%" : "—";
+
+  const chippauxBadge = (appointment: Appointment) => {
+    const idx = appointment.chippauxSmirakIndex;
+    const hasIndex =
+      idx !== null && idx !== undefined && !Number.isNaN(Number(idx));
+
+    if (!hasIndex) {
+      return (
+        <Badge variant="outline" className="text-xs">
+          {toPct(appointment.contactTotalPct)} contacto
+        </Badge>
+      );
+    }
+
+    const value = Number(idx);
+    let variant: "default" | "outline" | "secondary" = "outline";
+
+    // Si quieres, ajusta estos rangos clínicos
+    if (value < 25) {
+      variant = "secondary";
+    } else if (value < 45) {
+      variant = "default";
+    } else {
+      variant = "default";
+    }
+
+    return (
+      <Badge variant={variant} className="text-xs">
+        {value.toFixed(0)}% Chippaux
+      </Badge>
+    );
+  };
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -621,9 +658,7 @@ function AppointmentsGallerySimple({
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Footprints className="h-5 w-5 text-primary" /> Evaluación
               </CardTitle>
-              <Badge variant="outline" className="text-xs">
-                {toPct(appointment.contactTotalPct)}
-              </Badge>
+              {chippauxBadge(appointment)}
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4" />{" "}
@@ -632,6 +667,7 @@ function AppointmentsGallerySimple({
                 : "—"}
             </div>
           </CardHeader>
+
           <CardContent className="space-y-4">
             <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
               {appointment.processedUrl || appointment.originalUrl ? (
@@ -653,6 +689,7 @@ function AppointmentsGallerySimple({
               )}
             </div>
 
+            {/* Distribución de presión */}
             <div className="grid grid-cols-3 gap-2">
               <KpiPill
                 label="Antepié"
@@ -669,6 +706,28 @@ function AppointmentsGallerySimple({
                 value={toPct(appointment.rearfootPct)}
                 variant="heel"
               />
+            </div>
+
+            {/* Métricas geométricas / Chippaux */}
+            <div className="grid grid-cols-3 gap-2 text-center text-xs">
+              <div className="rounded-md bg-muted/60 p-2">
+                <div className="text-muted-foreground">Antepié</div>
+                <div className="mt-1 font-semibold">
+                  {formatMm(appointment.forefootWidthMm)}
+                </div>
+              </div>
+              <div className="rounded-md bg-muted/60 p-2">
+                <div className="text-muted-foreground">Istmo</div>
+                <div className="mt-1 font-semibold">
+                  {formatMm(appointment.isthmusWidthMm)}
+                </div>
+              </div>
+              <div className="rounded-md bg-muted/60 p-2">
+                <div className="text-muted-foreground">Chippaux</div>
+                <div className="mt-1 font-semibold">
+                  {formatChippaux(appointment.chippauxSmirakIndex)}
+                </div>
+              </div>
             </div>
 
             {appointment.note && (
