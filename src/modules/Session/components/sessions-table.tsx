@@ -284,37 +284,37 @@ export function SessionsTable() {
                                     ).toLocaleTimeString("es-ES")}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.p1.toFixed(2)}
+                                    {record.p1}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.p2.toFixed(2)}
+                                    {record.p2}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.p3.toFixed(2)}
+                                    {record.p3}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.p4.toFixed(2)}
+                                    {record.p4}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.p5.toFixed(2)}
+                                    {record.p5}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.ax.toFixed(2)}
+                                    {record.ax}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.ay.toFixed(2)}
+                                    {record.ay}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.az.toFixed(2)}
+                                    {record.az}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.gx.toFixed(2)}
+                                    {record.gx}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.gy.toFixed(2)}
+                                    {record.gy}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.gz.toFixed(2)}
+                                    {record.gz}
                                   </TableCell>
                                 </TableRow>
                               ))}
