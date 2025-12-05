@@ -604,10 +604,10 @@ export default function AppointmentViewPage() {
           <DialogHeader>
             <DialogTitle>3D Pie y hueso</DialogTitle>
           </DialogHeader>
-          <div className="mt-2 h-[70vh]">
+          <div className="mt-2">
             <iframe
-              width="640"
-              height="480"
+              width="840"
+              height="680"
               loading="lazy"
               src="https://p3d.in/e/Q9frV"
             ></iframe>
@@ -621,10 +621,10 @@ export default function AppointmentViewPage() {
           <DialogHeader>
             <DialogTitle>3D Pie y Hueso</DialogTitle>
           </DialogHeader>
-          <div className="mt-2 h-[70vh]">
+          <div className="mt-2 ">
             <iframe
-              width="640"
-              height="480"
+              width="840"
+              height="680"
               loading="lazy"
               src="https://p3d.in/e/ICU9r"
             ></iframe>
