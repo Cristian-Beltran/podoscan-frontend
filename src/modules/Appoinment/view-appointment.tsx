@@ -25,11 +25,22 @@ import FootPreviewModal from "./components/foot-model";
 // ✅ importa cliente MQTT correcto (usa mqtt/dist/mqtt.min.js dentro)
 import { getMqtt, sendLed, sendServo } from "@/lib/mqtt";
 
+// ✅ nuevos modales 3D
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
 export default function AppointmentViewPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
   const [open, setOpen] = useState(false);
+  const [open3dFoot, setOpen3dFoot] = useState(false);
+  const [open3dFootBone, setOpen3dFootBone] = useState(false);
+
   const {
     findOne,
     editPatientData,
@@ -339,15 +350,37 @@ export default function AppointmentViewPage() {
                     </div>
                   )}
                 </div>
-                <Button
-                  variant="outline"
-                  className="w-full print:hidden bg-transparent"
-                  onClick={() => setOpen(true)}
-                  disabled={isProcessing || !id}
-                >
-                  <Footprints className="mr-2 h-4 w-4" />
-                  Ver pie 3D
-                </Button>
+
+                {/* Botones 3D */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
+                  <Button
+                    variant="outline"
+                    className="w-full print:hidden bg-transparent"
+                    onClick={() => setOpen(true)}
+                    disabled={isProcessing || !id}
+                  >
+                    <Footprints className="mr-2 h-4 w-4" />
+                    Ver pie 3D (GLB)
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="w-full print:hidden bg-transparent"
+                    onClick={() => setOpen3dFoot(true)}
+                    disabled={isProcessing}
+                  >
+                    3D Pie plano
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="w-full print:hidden bg-transparent"
+                    onClick={() => setOpen3dFootBone(true)}
+                    disabled={isProcessing}
+                  >
+                    3D Pie curvo
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -558,11 +591,46 @@ export default function AppointmentViewPage() {
         </Card>
       </div>
 
+      {/* Modal 3D GLB actual */}
       <FootPreviewModal
         isOpen={open}
         onClose={() => setOpen(false)}
         modelUrl="/foot.glb"
       />
+
+      {/* 🔹 Modal 3D Pie (iframe) */}
+      <Dialog open={open3dFoot} onOpenChange={setOpen3dFoot}>
+        <DialogContent className="min-w-[90vw] md:min-w-3xl max-h-[90dvh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>3D Pie y hueso</DialogTitle>
+          </DialogHeader>
+          <div className="mt-2 h-[70vh]">
+            <iframe
+              width="640"
+              height="480"
+              loading="lazy"
+              src="https://p3d.in/e/Q9frV"
+            ></iframe>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 🔹 Modal 3D Pie y Hueso (iframe) */}
+      <Dialog open={open3dFootBone} onOpenChange={setOpen3dFootBone}>
+        <DialogContent className="min-w-[90vw] md:min-w-3xl max-h-[90dvh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>3D Pie y Hueso</DialogTitle>
+          </DialogHeader>
+          <div className="mt-2 h-[70vh]">
+            <iframe
+              width="640"
+              height="480"
+              loading="lazy"
+              src="https://p3d.in/e/ICU9r"
+            ></iframe>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
