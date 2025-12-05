@@ -600,7 +600,7 @@ export default function AppointmentViewPage() {
 
       {/* 🔹 Modal 3D Pie (iframe) */}
       <Dialog open={open3dFoot} onOpenChange={setOpen3dFoot}>
-        <DialogContent className="min-w-[90vw] md:min-w-3xl max-h-[90dvh] overflow-y-auto">
+        <DialogContent className="min-w-[90vw] md:min-w-3xl ">
           <DialogHeader>
             <DialogTitle>3D Pie y hueso</DialogTitle>
           </DialogHeader>
@@ -617,7 +617,7 @@ export default function AppointmentViewPage() {
 
       {/* 🔹 Modal 3D Pie y Hueso (iframe) */}
       <Dialog open={open3dFootBone} onOpenChange={setOpen3dFootBone}>
-        <DialogContent className="min-w-[90vw] md:min-w-3xl max-h-[90dvh] overflow-y-auto">
+        <DialogContent className="min-w-[90vw] md:min-w-3xl ">
           <DialogHeader>
             <DialogTitle>3D Pie y Hueso</DialogTitle>
           </DialogHeader>
