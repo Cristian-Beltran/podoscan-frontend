@@ -360,7 +360,7 @@ export default function AppointmentViewPage() {
                     disabled={isProcessing || !id}
                   >
                     <Footprints className="mr-2 h-4 w-4" />
-                    Ver pie 3D (GLB)
+                    Ver pie 3D
                   </Button>
 
                   <Button
@@ -606,8 +606,8 @@ export default function AppointmentViewPage() {
           </DialogHeader>
           <div className="mt-2">
             <iframe
-              width="840"
-              height="680"
+              width="700"
+              height="540"
               loading="lazy"
               src="https://p3d.in/e/Q9frV"
             ></iframe>
@@ -623,8 +623,8 @@ export default function AppointmentViewPage() {
           </DialogHeader>
           <div className="mt-2 ">
             <iframe
-              width="840"
-              height="680"
+              width="700"
+              height="540"
               loading="lazy"
               src="https://p3d.in/e/ICU9r"
             ></iframe>
