@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pen, RefreshCwIcon, XCircle } from "lucide-react";
+import { MoreHorizontal, Pen, XCircle } from "lucide-react";
 import type { Device } from "../device.interface";
 import { userDeviceStore } from "../data/device.store";
 
@@ -15,7 +15,7 @@ interface Props {
 }
 
 export const DeviceRowActions = ({ item, onEditUser }: Props) => {
-  const { changeStatus, remove, unlink } = userDeviceStore();
+  const { remove, unlink } = userDeviceStore();
 
   const handleUpdate = () => {
     onEditUser(item); // Abre el modal de edición
@@ -23,11 +23,6 @@ export const DeviceRowActions = ({ item, onEditUser }: Props) => {
 
   const handleDelete = () => {
     remove(item.id);
-  };
-
-  const handleStatus = () => {
-    const status = item.status;
-    changeStatus(item.id, status === "ACTIVE" ? "INACTIVE" : "ACTIVE");
   };
 
   const handleUnlink = () => {
@@ -45,9 +40,6 @@ export const DeviceRowActions = ({ item, onEditUser }: Props) => {
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={handleDelete}>
             <XCircle /> Eliminar
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleStatus}>
-            <RefreshCwIcon /> Cambiar estado
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleUpdate}>
             <Pen /> Editar

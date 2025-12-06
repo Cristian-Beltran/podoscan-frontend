@@ -18,7 +18,65 @@ import { ChevronDown, ChevronRight, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Session, SessionData } from "../session.interface";
 
-// Tipos derivados del store (sin usar any)
+const TIME_ZONE = "America/La_Paz";
+
+const formatDate = (date: string | Date) =>
+  new Date(date).toLocaleString("es-ES", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: TIME_ZONE,
+  });
+
+const formatTime = (date: string | Date) =>
+  new Date(date).toLocaleTimeString("es-ES", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    timeZone: TIME_ZONE,
+  });
+
+const formatDateTimeCsv = (date: string | Date | null | undefined): string => {
+  if (!date) return "";
+  return new Date(date).toLocaleString("sv-SE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    timeZone: TIME_ZONE,
+  });
+};
+
+// formatea números de records: si es número → máx 2 decimales, si no → vacío
+const formatNumber2Decimals = (value: unknown): string => {
+  if (value === null || value === undefined) return "";
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "";
+  return n.toFixed(2);
+};
+
+// para CSV usamos lo mismo
+const formatNumberCsv = (value: unknown): string => {
+  if (value === null || value === undefined) return "";
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "";
+  return n.toFixed(2);
+};
+
+const toCsvValue = (
+  value: string | number | boolean | null | undefined,
+): string => {
+  if (value === null || value === undefined) return "";
+  const str = String(value);
+  if (str.includes('"') || str.includes(",") || str.includes("\n")) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+};
 
 export function SessionsTable() {
   const { sessions, isLoading } = sessionStore();
@@ -34,26 +92,6 @@ export function SessionsTable() {
       }
       return next;
     });
-  };
-
-  const formatDate = (date: string | Date) =>
-    new Date(date).toLocaleString("es-ES", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
-  const toCsvValue = (
-    value: string | number | boolean | null | undefined,
-  ): string => {
-    if (value === null || value === undefined) return "";
-    const str = String(value);
-    if (str.includes('"') || str.includes(",") || str.includes("\n")) {
-      return `"${str.replace(/"/g, '""')}"`;
-    }
-    return str;
   };
 
   const downloadSessionCsv = (session: Session) => {
@@ -86,11 +124,9 @@ export function SessionsTable() {
     const deviceModel = session.device?.model ?? "";
     const deviceSerial = session.device?.serialNumber ?? "";
     const startedAt = session.startedAt
-      ? new Date(session.startedAt).toISOString()
+      ? formatDateTimeCsv(session.startedAt)
       : "";
-    const endedAt = session.endedAt
-      ? new Date(session.endedAt).toISOString()
-      : "";
+    const endedAt = session.endedAt ? formatDateTimeCsv(session.endedAt) : "";
 
     (session.records ?? []).forEach((record: SessionData) => {
       const rowValues: (string | number | boolean | null | undefined)[] = [
@@ -101,18 +137,18 @@ export function SessionsTable() {
         startedAt,
         endedAt,
         record.id,
-        record.recordedAt ? new Date(record.recordedAt).toISOString() : "",
-        record.p1,
-        record.p2,
-        record.p3,
-        record.p4,
-        record.p5,
-        record.ax,
-        record.ay,
-        record.az,
-        record.gx,
-        record.gy,
-        record.gz,
+        record.recordedAt ? formatDateTimeCsv(record.recordedAt) : "",
+        formatNumberCsv(record.p1),
+        formatNumberCsv(record.p2),
+        formatNumberCsv(record.p3),
+        formatNumberCsv(record.p4),
+        formatNumberCsv(record.p5),
+        formatNumberCsv(record.ax),
+        formatNumberCsv(record.ay),
+        formatNumberCsv(record.az),
+        formatNumberCsv(record.gx),
+        formatNumberCsv(record.gy),
+        formatNumberCsv(record.gz),
       ];
 
       const row = rowValues.map(toCsvValue).join(",");
@@ -213,7 +249,7 @@ export function SessionsTable() {
                     </TableCell>
 
                     <TableCell className="text-xs md:text-sm">
-                      {formatDate(session.startedAt)}
+                      {session.startedAt ? formatDate(session.startedAt) : "—"}
                     </TableCell>
                     <TableCell className="text-xs md:text-sm">
                       {session.endedAt ? formatDate(session.endedAt) : "—"}
@@ -226,7 +262,6 @@ export function SessionsTable() {
                   <CollapsibleContent asChild>
                     <TableRow>
                       <TableCell colSpan={7} className="bg-muted/50 p-0">
-                        {/* Header del detalle + botón CSV */}
                         <div className="flex items-center justify-between gap-2 p-4 pb-2">
                           <span className="text-xs text-muted-foreground">
                             Registros de la sesión
@@ -279,42 +314,42 @@ export function SessionsTable() {
                               {session.records?.map((record: SessionData) => (
                                 <TableRow key={record.id}>
                                   <TableCell className="font-mono text-[10px] md:text-xs">
-                                    {new Date(
-                                      record.recordedAt,
-                                    ).toLocaleTimeString("es-ES")}
+                                    {record.recordedAt
+                                      ? formatTime(record.recordedAt)
+                                      : "—"}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.p1}
+                                    {formatNumber2Decimals(record.p1)}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.p2}
+                                    {formatNumber2Decimals(record.p2)}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.p3}
+                                    {formatNumber2Decimals(record.p3)}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.p4}
+                                    {formatNumber2Decimals(record.p4)}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.p5}
+                                    {formatNumber2Decimals(record.p5)}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.ax}
+                                    {formatNumber2Decimals(record.ax)}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.ay}
+                                    {formatNumber2Decimals(record.ay)}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.az}
+                                    {formatNumber2Decimals(record.az)}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.gx}
+                                    {formatNumber2Decimals(record.gx)}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.gy}
+                                    {formatNumber2Decimals(record.gy)}
                                   </TableCell>
                                   <TableCell className="text-[10px] md:text-xs">
-                                    {record.gz}
+                                    {formatNumber2Decimals(record.gz)}
                                   </TableCell>
                                 </TableRow>
                               ))}

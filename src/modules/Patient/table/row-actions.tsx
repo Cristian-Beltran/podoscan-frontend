@@ -26,10 +26,10 @@ export const PatientRowActions = ({ item, onEditUser }: Props) => {
   const { changeStatus, remove } = userPatientStore();
   const navigate = useNavigate();
   const viewPlantilla = () => {
-    navigate("/session/" + item.id);
+    navigate("/session/" + item.user.id);
   };
   const viewGallery = () => {
-    navigate("/gallery/" + item.id);
+    navigate("/gallery/" + item.user.id);
   };
 
   const handleUpdate = () => {
