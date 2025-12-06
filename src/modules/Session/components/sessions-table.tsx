@@ -18,36 +18,47 @@ import { ChevronDown, ChevronRight, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Session, SessionData } from "../session.interface";
 
-const TIME_ZONE = "America/La_Paz";
+// Suma horas a una fecha
+const addHours = (date: string | Date, hours: number): Date => {
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return d;
+  d.setHours(d.getHours() + hours);
+  return d;
+};
 
-const formatDate = (date: string | Date) =>
-  new Date(date).toLocaleString("es-ES", {
+const formatDate = (date: string | Date) => {
+  const d = addHours(date, 4); // +4h
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleString("es-ES", {
     year: "numeric",
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    timeZone: TIME_ZONE,
   });
+};
 
-const formatTime = (date: string | Date) =>
-  new Date(date).toLocaleTimeString("es-ES", {
+const formatTime = (date: string | Date) => {
+  const d = addHours(date, 4); // +4h
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleTimeString("es-ES", {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    timeZone: TIME_ZONE,
   });
+};
 
 const formatDateTimeCsv = (date: string | Date | null | undefined): string => {
   if (!date) return "";
-  return new Date(date).toLocaleString("sv-SE", {
+  const d = addHours(date, 4); // +4h
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleString("sv-SE", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    timeZone: TIME_ZONE,
   });
 };
 
