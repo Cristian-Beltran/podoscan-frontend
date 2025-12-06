@@ -26,9 +26,9 @@ export function SessionCharts() {
   const { sessions } = sessionStore();
 
   const chartData = useMemo(() => {
-    const data = sessions.map((session, index) => {
+    const data = sessions.map((session) => {
       const records = session.records ?? [];
-      const count = records.length || 1; // evita división por 0
+      const count = records.length || 1;
 
       const sum = (k: keyof (typeof records)[number]) =>
         records.reduce((acc, r) => acc + (Number(r[k]) || 0), 0);
@@ -37,9 +37,8 @@ export function SessionCharts() {
         Number.parseFloat((sum(k) / count).toFixed(2));
 
       return {
-        session: `S${index + 1}`,
-        sessionId: session.id.slice(0, 8),
-        date: new Date(session.startedAt).toLocaleDateString("es-ES"),
+        originalId: session.id,
+        startedAt: session.startedAt,
         avgP1: avg("p1"),
         avgP2: avg("p2"),
         avgP3: avg("p3"),
@@ -52,8 +51,16 @@ export function SessionCharts() {
       };
     });
 
-    // 🔁 Invertimos el array para que los charts se dibujen al revés
-    return data.reverse();
+    // invertimos el orden
+    const reversed = data.reverse();
+
+    // 🔁 corregimos el número de sesión S1, S2, S3...
+    return reversed.map((item, index) => ({
+      session: `S${index + 1}`,
+      sessionId: item.originalId.slice(0, 8),
+      date: new Date(item.startedAt).toLocaleDateString("es-ES"),
+      ...item,
+    }));
   }, [sessions]);
 
   const pressureConfig = {
