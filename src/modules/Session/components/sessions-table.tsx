@@ -18,7 +18,7 @@ import { ChevronDown, ChevronRight, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Session, SessionData } from "../session.interface";
 
-// Suma horas a una fecha
+// Desplaza una fecha en horas (puede ser negativo)
 const addHours = (date: string | Date, hours: number): Date => {
   const d = new Date(date);
   if (isNaN(d.getTime())) return d;
@@ -27,7 +27,7 @@ const addHours = (date: string | Date, hours: number): Date => {
 };
 
 const formatDate = (date: string | Date) => {
-  const d = addHours(date, 4); // +4h
+  const d = addHours(date, -4); // -4h
   if (isNaN(d.getTime())) return "—";
   return d.toLocaleString("es-ES", {
     year: "numeric",
@@ -39,7 +39,7 @@ const formatDate = (date: string | Date) => {
 };
 
 const formatTime = (date: string | Date) => {
-  const d = addHours(date, 4); // +4h
+  const d = addHours(date, -4); // -4h
   if (isNaN(d.getTime())) return "—";
   return d.toLocaleTimeString("es-ES", {
     hour: "2-digit",
@@ -50,7 +50,7 @@ const formatTime = (date: string | Date) => {
 
 const formatDateTimeCsv = (date: string | Date | null | undefined): string => {
   if (!date) return "";
-  const d = addHours(date, 4); // +4h
+  const d = addHours(date, -4); // -4h
   if (isNaN(d.getTime())) return "";
   return d.toLocaleString("sv-SE", {
     year: "numeric",

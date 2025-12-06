@@ -26,7 +26,7 @@ export function SessionCharts() {
   const { sessions } = sessionStore();
 
   const chartData = useMemo(() => {
-    return sessions.map((session, index) => {
+    const data = sessions.map((session, index) => {
       const records = session.records ?? [];
       const count = records.length || 1; // evita división por 0
 
@@ -51,6 +51,9 @@ export function SessionCharts() {
         avgGz: avg("gz"),
       };
     });
+
+    // 🔁 Invertimos el array para que los charts se dibujen al revés
+    return data.reverse();
   }, [sessions]);
 
   const pressureConfig = {
