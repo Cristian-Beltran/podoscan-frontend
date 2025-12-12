@@ -110,9 +110,11 @@ export function SessionCharts() {
                 <YAxis className="text-xs" />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Legend />
+
                 <Line
                   type="monotone"
                   dataKey="avgP1"
+                  stroke="#ff0000"
                   strokeWidth={2}
                   name="P1 (Talón)"
                   dot={{ r: 4 }}
@@ -120,6 +122,7 @@ export function SessionCharts() {
                 <Line
                   type="monotone"
                   dataKey="avgP2"
+                  stroke="#00aa00"
                   strokeWidth={2}
                   name="P2 (Mediopié)"
                   dot={{ r: 4 }}
@@ -127,6 +130,7 @@ export function SessionCharts() {
                 <Line
                   type="monotone"
                   dataKey="avgP3"
+                  stroke="#0000ff"
                   strokeWidth={2}
                   name="P3 (Antepié)"
                   dot={{ r: 4 }}
@@ -154,9 +158,11 @@ export function SessionCharts() {
                 <YAxis className="text-xs" />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Legend />
+
                 <Line
                   type="monotone"
                   dataKey="avgAx"
+                  stroke="#ff0000"
                   strokeWidth={2}
                   name="AX"
                   dot={{ r: 4 }}
@@ -164,6 +170,7 @@ export function SessionCharts() {
                 <Line
                   type="monotone"
                   dataKey="avgAy"
+                  stroke="#00aa00"
                   strokeWidth={2}
                   name="AY"
                   dot={{ r: 4 }}
@@ -171,6 +178,7 @@ export function SessionCharts() {
                 <Line
                   type="monotone"
                   dataKey="avgAz"
+                  stroke="#0000ff"
                   strokeWidth={2}
                   name="AZ"
                   dot={{ r: 4 }}
@@ -195,9 +203,11 @@ export function SessionCharts() {
                 <YAxis className="text-xs" />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Legend />
+
                 <Line
                   type="monotone"
                   dataKey="avgGx"
+                  stroke="#ff0000"
                   strokeWidth={2}
                   name="GX"
                   dot={{ r: 4 }}
@@ -205,6 +215,7 @@ export function SessionCharts() {
                 <Line
                   type="monotone"
                   dataKey="avgGy"
+                  stroke="#00aa00"
                   strokeWidth={2}
                   name="GY"
                   dot={{ r: 4 }}
@@ -212,6 +223,7 @@ export function SessionCharts() {
                 <Line
                   type="monotone"
                   dataKey="avgGz"
+                  stroke="#0000ff"
                   strokeWidth={2}
                   name="GZ"
                   dot={{ r: 4 }}
