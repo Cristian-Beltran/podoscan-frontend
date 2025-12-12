@@ -557,11 +557,11 @@ function ImuOverviewPanel({ records }: { records: SessionData[] }) {
 
 function PressureBars({ record }: { record: SessionData }) {
   const items = [
-    { key: "p1", label: "Talón Kg", value: record.p1 },
-    { key: "p2", label: "Mediopié 1 Kg", value: record.p2 },
-    { key: "p3", label: "Mediopié 2 Kg", value: record.p3 },
-    { key: "p4", label: "Antepié 1 Kg", value: record.p4 },
-    { key: "p5", label: "Antepié 2 Kg", value: record.p5 },
+    { key: "p1", label: "Talón N", value: record.p1 },
+    { key: "p2", label: "Mediopié 1 N", value: record.p2 },
+    { key: "p3", label: "Mediopié 2 N", value: record.p3 },
+    { key: "p4", label: "Antepié 1 N", value: record.p4 },
+    { key: "p5", label: "Antepié 2 N", value: record.p5 },
   ];
   const max = Math.max(...items.map((i) => i.value), 1);
 

@@ -298,19 +298,19 @@ export function SessionsTable() {
                                 </TableHead>
 
                                 <TableHead className="text-xs">
-                                  P1 (Talón, kg)
+                                  P1 (Talón, N)
                                 </TableHead>
                                 <TableHead className="text-xs">
-                                  P2 (Mediopié 1, kg)
+                                  P2 (Mediopié 1, N)
                                 </TableHead>
                                 <TableHead className="text-xs">
-                                  P3 (Mediopié 2, kg)
+                                  P3 (Mediopié 2, N)
                                 </TableHead>
                                 <TableHead className="text-xs">
-                                  P4 (Antepié 1, kg)
+                                  P4 (Antepié 1, N)
                                 </TableHead>
                                 <TableHead className="text-xs">
-                                  P5 (Antepié 2, kg)
+                                  P5 (Antepié 2, N)
                                 </TableHead>
 
                                 <TableHead className="text-xs">AX</TableHead>
