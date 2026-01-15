@@ -425,7 +425,7 @@ export default function FamilyPatientsPage() {
                 {filtered.map((p) => (
                   <PatientCard
                     key={p.id}
-                    id={p.id}
+                    id={p.user.id}
                     fullname={p.user.fullname}
                     email={p.user.email}
                     deviceSerial={p.device?.serialNumber}

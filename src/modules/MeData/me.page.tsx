@@ -312,7 +312,23 @@ function MiniKpi({
 }
 
 /** ===================== UI: Sesiones ===================== */
+
 function PressureOverviewPanel({ records }: { records: SessionData[] }) {
+  // ✅ colores fijos (elige los que quieras)
+  const PRESSURE_LINE_COLORS = {
+    heel: "#ef4444", // rojo
+    mid: "#22c55e", // verde
+    fore: "#3b82f6", // azul
+  } as const;
+
+  const GYRO_LINE_COLORS = {
+    gx: "#a855f7", // morado
+    gy: "#f59e0b", // ámbar
+    gz: "#06b6d4", // cian
+  } as const;
+
+  const PIE_COLORS = ["#ef4444", "#22c55e", "#3b82f6"]; // Retropié/Mediopié/Antepié (mismo orden)
+
   const lineData = useMemo(
     () =>
       records.slice(-300).map((r) => ({
@@ -327,12 +343,28 @@ function PressureOverviewPanel({ records }: { records: SessionData[] }) {
     [records],
   );
 
+  // ✅ nueva data para giroscopio
+  const gyroData = useMemo(
+    () =>
+      records.slice(-300).map((r) => ({
+        t: new Date(r.recordedAt).toLocaleTimeString("es-ES", {
+          minute: "2-digit",
+          second: "2-digit",
+        }),
+        gx: r.gx,
+        gy: r.gy,
+        gz: r.gz,
+      })),
+    [records],
+  );
+
   const pieAgg = useMemo(() => {
     const sum = (arr: number[]) => arr.reduce((a, b) => a + b, 0);
     const heel = sum(records.map((r) => r.p1));
     const mid = sum(records.map((r) => r.p2 + r.p3));
     const fore = sum(records.map((r) => r.p4 + r.p5));
     const total = heel + mid + fore || 1;
+
     return [
       { name: "Retropié", value: Math.round((heel / total) * 100) },
       { name: "Mediopié", value: Math.round((mid / total) * 100) },
@@ -357,9 +389,12 @@ function PressureOverviewPanel({ records }: { records: SessionData[] }) {
                   <XAxis dataKey="t" hide />
                   <YAxis />
                   <Tooltip formatter={(v: number) => v.toFixed(0)} />
+
+                  {/* ✅ colores fijos por línea */}
                   <Line
                     type="monotone"
                     dataKey="heel"
+                    stroke={PRESSURE_LINE_COLORS.heel}
                     strokeWidth={2}
                     dot={false}
                     name="Retropié"
@@ -367,6 +402,7 @@ function PressureOverviewPanel({ records }: { records: SessionData[] }) {
                   <Line
                     type="monotone"
                     dataKey="mid"
+                    stroke={PRESSURE_LINE_COLORS.mid}
                     strokeWidth={2}
                     dot={false}
                     name="Mediopié"
@@ -374,6 +410,7 @@ function PressureOverviewPanel({ records }: { records: SessionData[] }) {
                   <Line
                     type="monotone"
                     dataKey="fore"
+                    stroke={PRESSURE_LINE_COLORS.fore}
                     strokeWidth={2}
                     dot={false}
                     name="Antepié"
@@ -403,27 +440,93 @@ function PressureOverviewPanel({ records }: { records: SessionData[] }) {
                     innerRadius={55}
                     outerRadius={85}
                   >
+                    {/* ✅ colores fijos por slice */}
                     {pieAgg.map((_, idx) => (
-                      <Cell key={idx} />
+                      <Cell
+                        key={idx}
+                        fill={PIE_COLORS[idx % PIE_COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip formatter={(v: number) => `${v}%`} />
                 </PieChart>
               </ResponsiveContainer>
+
               <Separator className="my-3" />
+
               <div className="grid grid-cols-3 gap-2 text-center">
-                {pieAgg.map((s) => (
+                {pieAgg.map((s, idx) => (
                   <div key={s.name} className="rounded border p-2">
                     <div className="text-xs text-muted-foreground">
                       {s.name}
                     </div>
                     <div className="text-xl font-semibold">{s.value}%</div>
+
+                    {/* ✅ mini swatch del color */}
+                    <div className="mt-2 flex justify-center">
+                      <span
+                        className="h-2 w-10 rounded"
+                        style={{
+                          background: PIE_COLORS[idx % PIE_COLORS.length],
+                        }}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           ) : (
             <EmptyState caption="Sin datos para el promedio" />
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ✅ nueva gráfica de giroscopio */}
+      <Card className="md:col-span-5">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">
+            Giroscopio a lo largo del tiempo
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {records.length ? (
+            <div className="h-56">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={gyroData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="t" hide />
+                  <YAxis />
+                  <Tooltip formatter={(v: number) => Number(v).toFixed(2)} />
+
+                  <Line
+                    type="monotone"
+                    dataKey="gx"
+                    stroke={GYRO_LINE_COLORS.gx}
+                    strokeWidth={2}
+                    dot={false}
+                    name="Gx"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="gy"
+                    stroke={GYRO_LINE_COLORS.gy}
+                    strokeWidth={2}
+                    dot={false}
+                    name="Gy"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="gz"
+                    stroke={GYRO_LINE_COLORS.gz}
+                    strokeWidth={2}
+                    dot={false}
+                    name="Gz"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <EmptyState caption="Aún no hay registros del giroscopio" />
           )}
         </CardContent>
       </Card>
