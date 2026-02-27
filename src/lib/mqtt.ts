@@ -28,3 +28,9 @@ export function sendServo(dir: "adelante" | "atras") {
   const c = getMqtt();
   c.publish("devices/esp/servo", dir);
 }
+
+export function sendStream(enabled: boolean) {
+  const c = getMqtt();
+  // canal nuevo, payload simple
+  c.publish("devices/esp/stream", enabled ? "start" : "stop");
+}
