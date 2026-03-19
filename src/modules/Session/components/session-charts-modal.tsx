@@ -29,6 +29,7 @@ type Props = {
 export function SessionChartsModal({ open, onOpenChange, session }: Props) {
   const records = session?.records ?? [];
   const contentRef = useRef<HTMLDivElement>(null);
+  const patientName = session?.patient?.user?.fullname ?? "Paciente sin nombre";
 
   // ✅ colores fijos (consistentes)
   const COLORS = {
@@ -91,7 +92,7 @@ export function SessionChartsModal({ open, onOpenChange, session }: Props) {
     printWindow.document.write(`
       <html>
         <head>
-          <title>Sesion ${session?.id?.slice(0, 8) ?? ""}</title>
+          <title>Sesion ${patientName}</title>
           <style>
             body {
               margin: 0;
@@ -106,6 +107,9 @@ export function SessionChartsModal({ open, onOpenChange, session }: Props) {
             }
             svg {
               overflow: visible;
+            }
+            .pdf-action {
+              display: none !important;
             }
           </style>
         </head>
@@ -131,8 +135,8 @@ export function SessionChartsModal({ open, onOpenChange, session }: Props) {
               <div className="space-y-1">
                 <DialogTitle className="flex items-center justify-between gap-2">
                   Gráficos de la sesión{" "}
-                  <span className="font-mono text-xs text-muted-foreground">
-                    {session?.id ? session.id.slice(0, 8) : ""}
+                  <span className="text-xs text-muted-foreground">
+                    {patientName}
                   </span>
                 </DialogTitle>
                 <DialogDescription>
@@ -144,6 +148,7 @@ export function SessionChartsModal({ open, onOpenChange, session }: Props) {
                 type="button"
                 variant="outline"
                 onClick={handleDownloadPdf}
+                className="pdf-action"
               >
                 Descargar PDF
               </Button>
